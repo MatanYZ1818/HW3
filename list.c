@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include "list.h"
 
+#include "ShoppingItem.h"
+
 
 //////////////////////////////////////////
 // Init
@@ -109,11 +111,11 @@ BOOL L_free(LIST *pList) {
 
 ////////////////////////////////////////////////
 // Print (additional function)
-// Aim:		print the list content (assume the DATA is int)
+// Aim:		print the list content
 // Input:	pointer to the list structure and a pointer the print function of the specific DATA type
 // Output:	a number of the printed elements
 ////////////////////////////////////////////////
-int L_print(const LIST *pList) {
+int L_print(const LIST *pList, void (*printElem)(DATA const)) {
     NODE *tmp;
     int c = 0;
 
@@ -123,10 +125,35 @@ int L_print(const LIST *pList) {
     printf("\n");
     tmp = pList->head.next;
     while (tmp != NULL) {
-        printf(" %d ---> ", tmp->key);
+        printElem((char*)tmp->key);
         c++;
         tmp = tmp->next;
     }
     printf("\n");
     return c;
+}
+
+void L_printItem(DATA const pItem)
+{
+    printItem(pItem);
+}
+
+void L_printInt(DATA const pInt)
+{
+    printf(" %d ---> ", *(int*)pInt);
+}
+
+void L_printFloat(DATA const pFloat)
+{
+    printf(" %.2f ---> ", *(float*)pFloat);
+}
+
+void L_printChar(DATA const pChar)
+{
+    printf(" %c ---> ", *(char*)pChar);
+}
+
+void L_printString(DATA const pString)
+{
+    printf(" %s ---> ", (char*)pString);
 }

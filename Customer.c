@@ -4,6 +4,7 @@
 #include <ctype.h>
 #include "Customer.h"
 #include "General.h"
+#include "ClubMember.h"
 
 int	initCustomer(Customer* pCustomer)
 {
@@ -20,18 +21,33 @@ int	initCustomer(Customer* pCustomer)
 
 	char* combineName = combineFirstLast(parts);
 	if (!combineName)
-		return 0;
+		return False;
 
 	pCustomer->name = combineName;
 	pCustomer->pCart = NULL;
 
 	getCustomerID(pCustomer);
 
-	return 1;
-	
+	return getMembership(pCustomer);
 }
 
-void getCustomerID(Customer* pCustomer)
+int		getMembership(Customer* pCustomer)
+{
+	char ans;
+	do
+	{
+		puts("Does the customer have a membership? (y/n)");
+		scanf(" %c", &ans);
+		getchar();
+	} while (tolower(ans) != 'y' && tolower(ans) != 'n');
+	if (ans == 'y')
+	{
+		return initClubMember(pCustomer);
+	}
+	return True;
+}
+
+void	getCustomerID(Customer* pCustomer)
 {
 	char msg[MAX_STR_LEN];
 	sprintf(msg, "ID should be %d digits\n"
@@ -105,6 +121,9 @@ void printCustomer(const Customer* pCustomer)
 	printf("Name: %s\n", pCustomer->name);
 	printf("ID: %s\n", pCustomer->id);
 
+	if (pCustomer->pDeprivedObj)
+		printf("%s is a club member for %d months\n", pCustomer->name, ((ClubMember*)pCustomer->pDeprivedObj)->totalMonth);
+
 	if (pCustomer->pCart == NULL)
 		printf("Shopping cart is empty!\n");
 	else
@@ -165,4 +184,6 @@ void freeCustomer(Customer* pCust)
 	pCust->id = NULL;
 	pCust->name = NULL;
 	pCust->pCart = NULL;
+	if (pCust->pDeprivedObj)
+		free(pCust->pDeprivedObj);
 }

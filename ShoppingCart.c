@@ -7,67 +7,52 @@
 int	initCart(ShoppingCart* pCart)
 {
 	pCart->itemList = (LIST*)malloc(sizeof(LIST));
+	return L_init(pCart->itemList);
 }
 
 float	getTotalPrice(const ShoppingCart* pCart)
 {
-    /*
-	float price = 0;
-	ShoppingItem* pItem;
-	for (int i = 0; i < pCart->count; i++)
-	{
-		pItem = pCart->itemArr[i];
-		price += (pItem->price * pItem->count);
-	}
-    */
 
     float price = 0;
     NODE *pItem = pCart->itemList->head.next;
     while (pItem != NULL)
     {
-        price += *(ShoppingItem*)pItem->key * pItem.;
+        price += ((ShoppingItem*)pItem->key)->price * ((ShoppingItem*)pItem->key)->count;
+    	pItem = pItem->next;
     }
 
 	return price;
 }
 
-int		addItemToCart(ShoppingCart* pCart, const char* barcode, float price, int count)
+int	addItemToCart(ShoppingCart* pCart, const char* barcode, float price, int count)
 {
 	ShoppingItem* pItem = getItemByBarocde(pCart, barcode);
 	if (!pItem) //new item
 	{
 		pItem = createItem(barcode, price, count);
 		if (!pItem)
-			return 0;
+			return True;
 
-		ShoppingItem** tempArr = (ShoppingItem**)realloc(pCart->itemArr, (pCart->count + 1) * sizeof(ShoppingItem*));
-		if (!tempArr) {
-			freeShoppingCart(pCart);
-			return 0;
-		}
-		pCart->itemArr = tempArr;
-
-		pCart->itemArr[pCart->count] = pItem;
-		pCart->count++;
-
+		NODE *pTemp = &pCart->itemList->head;
+		while (pTemp->next != NULL && strcmp(pItem->barcode, ((ShoppingItem*)pTemp->next->key)->barcode) == 1) pTemp = pTemp->next;
+		L_insert(pTemp, pItem);
 	}
 	else {
 		pItem->count += count;
 	}
-	return 1;
+	return False;
 }
 
 float	printShoppingCart(const ShoppingCart* pCart)
 {
-	ShoppingItem* pItem;
 	float price = 0;
-	for (int i = 0; i < pCart->count; i++)
+	L_print(pCart->itemList, L_printItem);
+	NODE *pItem = pCart->itemList->head.next;
+	while (pItem != NULL)
 	{
-		pItem = pCart->itemArr[i];
-		printItem(pItem);
-		price += (pItem->price * pItem->count);
+		price += ((ShoppingItem*)pItem->key)->price;
+		pItem = pItem->next;
 	}
-
 	printf("Total bill to pay: %.2f\n", price);
 	return price;
 }
@@ -76,18 +61,19 @@ float	printShoppingCart(const ShoppingCart* pCart)
 
 ShoppingItem*	getItemByBarocde(ShoppingCart* pCart, const char* barcode)
 {
-	for (int i = 0; i < pCart->count; i++)
+	NODE *pItem = pCart->itemList->head.next;
+	while (pItem != NULL)
 	{
-		if (strcmp(pCart->itemArr[i]->barcode,barcode) == 0)
-			return pCart->itemArr[i];
+		if (strcmp(((ShoppingItem*)pItem->key)->barcode, barcode) == 0)
+			return pItem->key;
 	}
+
 	return NULL;
 }
 
-void	freeShoppingCart(ShoppingCart* pCart)
+int	freeShoppingCart(ShoppingCart* pCart)
 {
-	for (int i = 0; i < pCart->count; i++)
-		free(pCart->itemArr[i]);
-
-	free(pCart->itemArr);
+	if (!L_free(pCart->itemList)) return False;
+	free(pCart->itemList);
+	return True;
 }

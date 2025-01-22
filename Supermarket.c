@@ -180,7 +180,7 @@ int	doShopping(SuperMarket* pMarket)
 		initCart(pCustomer->pCart);
 	}
 	fillCart(pMarket, pCustomer->pCart);
-	if (pCustomer->pCart->count == 0) //did not buy any thing
+	if (pCustomer->pCart->itemList->head.next == NULL) //did not buy any thing
 	{
 		free(pCustomer->pCart);
 		pCustomer->pCart = NULL;
@@ -314,11 +314,12 @@ void clearCart(SuperMarket* pMarket, Customer* pCustomer)
 {
 	if (pCustomer->pCart == NULL)
 		return;
-	for (int i = 0; i < pCustomer->pCart->count; i++)
+	NODE *pTemp = pCustomer->pCart->itemList->head.next;
+	while (pTemp != NULL)
 	{
-		Product* pProd = getProductByBarcode(pMarket, pCustomer->pCart->itemArr[i]->barcode);
+		Product* pProd = getProductByBarcode(pMarket, ((ShoppingItem*)pTemp->key)->barcode);
 		if (pProd)
-			pProd->count += pCustomer->pCart->itemArr[i]->count;
+			pProd->count += ((ShoppingItem*)pTemp->key)->count;
 	}
 }
 

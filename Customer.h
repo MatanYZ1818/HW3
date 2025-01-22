@@ -1,20 +1,25 @@
 #pragma once
 #include "ShoppingCart.h"
+#include "vtable.h"
 
 #define CUSTOMER_ID_LENGTH 9
 #define NAMES_SEP " "
 #define NAME_PARTS_SEP "- "
 
-typedef struct
+typedef struct _Customer
 {
+	void*			pDeprivedObj;
+	CustomerVTable	table;
 	char*			id;
 	char*			name;
 	ShoppingCart*	pCart;
-}Customer;
+} Customer;
+
 
 int		initCustomer(Customer* pCustomer);
 void	getCustomerID(Customer* pCustomer);
 void	printCustomer(const Customer* pCustomer);
+int		getMembership(Customer* pCustomer);
 
 int		isCustomerIdValid(const char* id);
 

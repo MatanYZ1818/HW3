@@ -24,4 +24,7 @@ add_executable(HW3
     Supermarket.h
     list.c
     list.h
-    def.h)
+    def.h
+        ClubMember.c
+        ClubMember.h
+        vtable.h)
