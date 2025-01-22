@@ -4,14 +4,14 @@
 #include "ShoppingCart.h"
 #include "General.h"
 
-void	initCart(ShoppingCart* pCart)
+int	initCart(ShoppingCart* pCart)
 {
-	pCart->count = 0;
-	pCart->itemArr = NULL;
+	pCart->itemList = (LIST*)malloc(sizeof(LIST));
 }
 
 float	getTotalPrice(const ShoppingCart* pCart)
 {
+    /*
 	float price = 0;
 	ShoppingItem* pItem;
 	for (int i = 0; i < pCart->count; i++)
@@ -19,6 +19,15 @@ float	getTotalPrice(const ShoppingCart* pCart)
 		pItem = pCart->itemArr[i];
 		price += (pItem->price * pItem->count);
 	}
+    */
+
+    float price = 0;
+    NODE *pItem = pCart->itemList->head.next;
+    while (pItem != NULL)
+    {
+        price += *(ShoppingItem*)pItem->key * pItem.;
+    }
+
 	return price;
 }
 

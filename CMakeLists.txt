@@ -21,4 +21,7 @@ add_executable(HW3
     ShoppingItem.c
     ShoppingItem.h
     Supermarket.c
-    Supermarket.h)
+    Supermarket.h
+    list.c
+    list.h
+    def.h)
