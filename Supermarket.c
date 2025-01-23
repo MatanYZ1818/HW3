@@ -9,6 +9,7 @@
 #include "ShoppingCart.h"
 #include "ClubMember.h"
 
+static const char* typeStr[eNofProductType] = { "None", "Name", "Amount", "Price" };
 
 int		initSuperMarket(SuperMarket* pMarket)
 {
@@ -16,6 +17,7 @@ int		initSuperMarket(SuperMarket* pMarket)
 	pMarket->customerArr = NULL;
 	pMarket->productCount = 0;
 	pMarket->productArr = NULL;
+    pMarket->sortingType = eNone;
 	pMarket->name = getStrExactLength("Enter market name");
 
 	if (!pMarket->name)
@@ -51,6 +53,12 @@ int		addProduct(SuperMarket* pMarket)
 			free(pProd);
 			return 0;
 		}
+        if (pMarket->sortingType != eNone)
+        {
+            int (*compare)(const void*, const void*) = NULL;
+            getCompareType(pMarket->sortingType, compare);
+            qsort(pMarket->productArr, pMarket->productCount, sizeof(Product*), compare);
+        }
 		return 1;
 	}
 	else if (pMarket->productCount > 0)
@@ -461,3 +469,113 @@ Customer* FindCustomerById(SuperMarket* pMarket, const char* id)
 	}
 	return  NULL;
 }
+
+eSortingType typeMenu()
+{
+    int option;
+
+    printf("\n");
+    do {
+        printf("Please enter one of the following types\n");
+        for (int i = 1; i < eNofSortingType; i++)
+            printf("%d for %s\n", i, typeStr[i]);
+        scanf("%d", &option);
+    } while (option < 0 || option >= eNofSortingType);
+
+    getchar();
+
+    return option;
+}
+
+void getCompareType(eSortingType sortingType, int (*compare)(const void*, const void*))
+{
+    switch (sortingType)
+    {
+        case eName:
+            compare = compareProductByAmount;
+            break;
+        case eAmount:
+            compare = compareProductByAmount;
+            break;
+        case ePrice:
+            compare = compareProductByPrice;
+            break;
+    }
+}
+
+void sortProductArray(SuperMarket *pMarket)
+{
+    eSortingType type = typeMenu();
+    if (pMarket->sortingType != type)
+    {
+        pMarket->sortingType = type;
+        int (*compare)(const void*, const void*) = NULL;
+        getCompareType(pMarket->sortingType, compare);
+        qsort(pMarket->productArr, pMarket->productCount, sizeof(Product*), compare);
+    }
+}
+
+void getProductToSearch(Product* p, eSortingType sortingType)
+{
+    printf("Enter the %s of the product you want to search for:\n", typeStr[sortingType]);
+    switch (sortingType)
+    {
+        case eName:
+            myGets(p->name, NAME_LENGTH + 1);
+        case eAmount:
+            while (True)
+            {
+                scanf("%d", &p->count);
+                if (p->count >= 0)
+                    break;
+                puts("Amount should be 0 or above");
+            }
+            break;
+        case ePrice:
+            while (True)
+            {
+                scanf("%f", &p->price);
+                if (p->price > 0)
+                    break;
+                puts("Price should be above 0");
+            }
+            break;
+    }
+}
+
+void searchProduct(const SuperMarket *pMarket)
+{
+    if (pMarket->sortingType == eNone)
+        puts("Products array isn't sorted");
+    else
+    {
+        Product p = { 0 };
+        getProductToSearch(&p, pMarket->sortingType);
+        int (*compare)(const void*, const void*) = NULL;
+        getCompareType(pMarket->sortingType, compare);
+        Product* pProd = *(Product**) bsearch(&p , pMarket->productArr, pMarket->productCount, sizeof(Product*), compare);
+        if (!pProd)
+            puts("Product doesn't exist");
+        else
+            printProduct(pProd);
+    }
+}
+
+int compareProductByName(const void *pProdPtrA,const void *pProdPtrB) {
+    Product* pA = *(Product**)pProdPtrA;
+    Product* pB = *(Product**)pProdPtrB;
+    return strcmp(pA->name, pB->name);
+}
+
+int compareProductByAmount(const void *pProdPtrA, const void *pProdPtrB) {
+    Product* pA = *(Product**)pProdPtrA;
+    Product* pB = *(Product**)pProdPtrB;
+    return pA->count - pB->count;
+}
+
+int compareProductByPrice(const void *pProdPtrA, const void *pProdPtrB) {
+    Product* pA = *(Product**)pProdPtrA;
+    Product* pB = *(Product**)pProdPtrB;
+    return pA->price - pB->price;
+}
+
