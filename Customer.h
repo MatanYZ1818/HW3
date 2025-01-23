@@ -8,8 +8,9 @@
 
 typedef struct _Customer
 {
-	void*			pDeprivedObj;
+	void*			pClubMemberObj;
 	CustomerVTable	table;
+
 	char*			id;
 	char*			name;
 	ShoppingCart*	pCart;
@@ -19,7 +20,7 @@ typedef struct _Customer
 int		initCustomer(Customer* pCustomer);
 void	getCustomerID(Customer* pCustomer);
 void	printCustomer(const Customer* pCustomer);
-int		getMembership(Customer* pCustomer);
+int		isMember();
 
 int		isCustomerIdValid(const char* id);
 
@@ -29,7 +30,7 @@ void	getNamePart(char* part, const char* msg);
 void	upperLowerCustomerName(char* name);
 //char*	combineFirstLast(char*  firstName, char* lastName);
 char*	combineFirstLast(char** parts);
-void	pay(Customer* pCustomer);
+void	customerPay(Customer* pCustomer);
 void	cancelShopping(Customer* pCustomer);
 
 void	freeCustomer(Customer* pCust);

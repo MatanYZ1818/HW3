@@ -28,10 +28,12 @@ int	initCustomer(Customer* pCustomer)
 
 	getCustomerID(pCustomer);
 
-	return getMembership(pCustomer);
+    pCustomer->table.pay = customerPay;
+    pCustomer->table.print = printCustomer;
+    pCustomer->table.free = freeCustomer;
 }
 
-int		getMembership(Customer* pCustomer)
+int		isMember()
 {
 	char ans;
 	do
@@ -40,11 +42,7 @@ int		getMembership(Customer* pCustomer)
 		scanf(" %c", &ans);
 		getchar();
 	} while (tolower(ans) != 'y' && tolower(ans) != 'n');
-	if (ans == 'y')
-	{
-		return initClubMember(pCustomer);
-	}
-	return True;
+	return ans == 'y';
 }
 
 void	getCustomerID(Customer* pCustomer)
@@ -85,7 +83,7 @@ void	upperLowerCustomerName(char* name)
 	*name = toupper(*name);
 }
 
-char* combineFirstLast(char** parts)
+char*   combineFirstLast(char** parts)
 {
 	char temp[MAX_STR_LEN * 2] = { 0 };
 	char** pNameParts = NULL;
@@ -116,13 +114,10 @@ char* combineFirstLast(char** parts)
 	return combineName;
 }
 
-void printCustomer(const Customer* pCustomer)
+void    printCustomer(const Customer* pCustomer)
 {
 	printf("Name: %s\n", pCustomer->name);
 	printf("ID: %s\n", pCustomer->id);
-
-	if (pCustomer->pDeprivedObj)
-		printf("%s is a club member for %d months\n", pCustomer->name, ((ClubMember*)pCustomer->pDeprivedObj)->totalMonth);
 
 	if (pCustomer->pCart == NULL)
 		printf("Shopping cart is empty!\n");
@@ -132,7 +127,7 @@ void printCustomer(const Customer* pCustomer)
 	}
 }
 
-int isCustomerIdValid(const char* id)
+int     isCustomerIdValid(const char* id)
 {
 	if (strlen(id) != CUSTOMER_ID_LENGTH)
 		return 0;
@@ -145,7 +140,7 @@ int isCustomerIdValid(const char* id)
 }
 
 
-void pay(Customer* pCustomer)
+void    customerPay(Customer* pCustomer)
 {
 	if (!pCustomer->pCart)
 		return;
@@ -157,7 +152,7 @@ void pay(Customer* pCustomer)
 	pCustomer->pCart = NULL;
 }
 
-void cancelShopping(Customer* pCustomer)
+void    cancelShopping(Customer* pCustomer)
 {
 	if (!pCustomer->pCart)
 		return;
@@ -168,22 +163,20 @@ void cancelShopping(Customer* pCustomer)
 }
 
 
-int	isCustomerById(const Customer* pCust, const char* id)
+int	    isCustomerById(const Customer* pCust, const char* id)
 {
 	if (strcmp(pCust->id, id) == 0)
 		return 1;
 	return 0;
 }
 
-void freeCustomer(Customer* pCust)
+void    freeCustomer(Customer* pCust)
 {
 	if (pCust->pCart)
-		pay(pCust); //will free every thing
+		customerPay(pCust); //will free every thing
 	free(pCust->name);
 	free(pCust->id);
 	pCust->id = NULL;
 	pCust->name = NULL;
 	pCust->pCart = NULL;
-	if (pCust->pDeprivedObj)
-		free(pCust->pDeprivedObj);
 }

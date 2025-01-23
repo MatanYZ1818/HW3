@@ -23,7 +23,7 @@ typedef struct
 void			initProduct(Product* pProduct);
 void			initProductNoBarcode(Product* pProduct);
 void			initProductName(Product* pProduct);
-void			printProduct(const Product* pProduct);
+void			printProduct(void* pProductPtr);
 
 void			generateBarcode(Product* pProd);
 void			getBarcodeCode(char* code);

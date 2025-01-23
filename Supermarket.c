@@ -7,6 +7,7 @@
 #include "Customer.h"
 #include "General.h"
 #include "ShoppingCart.h"
+#include "ClubMember.h"
 
 
 int		initSuperMarket(SuperMarket* pMarket)
@@ -126,11 +127,13 @@ int isCustomerIdUnique(const SuperMarket* pMarket, const char* id)
 
 int		addCustomer(SuperMarket* pMarket)
 {
+
 	Customer cust = { 0 };
 
 	do {
 		freeCustomer(&cust);
-		if (!initCustomer(&cust))
+
+		if (!(isMember() ? initClubMember(&cust) : initCustomer(&cust)))
 		{
 			freeCustomer(&cust);
 			return 0;
@@ -199,7 +202,15 @@ Customer*	doPrintCart(SuperMarket* pMarket)
 		printf("Customer cart is empty\n");
 		return NULL;
 	}
+    if (pCustomer->pClubMemberObj)
+        if (!addDiscount(pCustomer))
+        {
+            puts("Printing failed");
+            return NULL;
+        }
 	printShoppingCart(pCustomer->pCart);
+    if (pCustomer->pClubMemberObj)
+        delDiscount(pCustomer);
 	return pCustomer;
 }
 
@@ -219,7 +230,7 @@ int	manageShoppingCart(SuperMarket* pMarket)
 	getchar(); //clean the enter
 
 	if (answer == 'y' || answer == 'Y')
-		pay(pCustomer);
+		pCustomer->table.pay(pCustomer);
 	else {
 		clearCart(pMarket, pCustomer);
 		cancelShopping(pCustomer);
@@ -259,15 +270,14 @@ void	printAllProducts(const SuperMarket* pMarket)
 	printf("%-20s %-10s %-20s %-15s\n", "Type", "Price", "Count In Stoke", "Expiry Date");
 	printf("-------------------------------------------------------------------------------------------------\n");
 
-	for (int i = 0; i < pMarket->productCount; i++)
-		printProduct(pMarket->productArr[i]);
+    generalArrayFunction(pMarket->productArr, pMarket->productCount, sizeof(Product*), printProduct);
 }
 
 void	printAllCustomers(const SuperMarket* pMarket)
 {
 	printf("There are %d listed customers\n", pMarket->customerCount);
 	for (int i = 0; i < pMarket->customerCount; i++)
-		printCustomer(&pMarket->customerArr[i]);
+        pMarket->customerArr[i].table.print(&pMarket->customerArr[i]);
 }
 
 
@@ -305,7 +315,7 @@ void fillCart(SuperMarket* pMarket, ShoppingCart* pCart)
 				printf("Error adding item\n");
 				return;
 			}
-			pProd->count -= count; //item bought!!!
+			pProd->count = count; //item bought!!!
 		}
 	}
 }
@@ -345,6 +355,7 @@ Product* getProductAndCount(SuperMarket* pMarket, int* pCount)
 		scanf("%d", &count);
 	} while (count <= 0 || count > pProd->count);
 	*pCount = count;
+    pProd->count -= count;
 	return pProd;
 }
 
@@ -362,7 +373,7 @@ void	printProductByType(SuperMarket* pMarket)
 		if (pMarket->productArr[i]->type == type)
 		{
 			count++;
-			printProduct(pMarket->productArr[i]);
+			printProduct(pMarket->productArr + i);
 		}
 	}
 	if (count == 0)
@@ -401,7 +412,7 @@ void freeProducts(SuperMarket* pMarket)
 void freeCustomers(SuperMarket* pMarket)
 {
 	for (int i = 0; i < pMarket->customerCount; i++)
-		freeCustomer(&pMarket->customerArr[i]);
+        pMarket->customerArr[i].table.free(&pMarket->customerArr[i]);
 	free(pMarket->customerArr);
 }
 

@@ -29,6 +29,9 @@ char* getDynStr(char* str)
 char* getsStrFixSize(char* buffer, int size, const char* msg)
 {
 	puts(msg);
+    //delete later
+    setbuf(stdout, 0);
+    //delete later
 	return myGets(buffer, size);
 }
 
@@ -171,4 +174,11 @@ void toLowerStr(char* str)
 		*str = tolower(*str);
 		str++;
 	}
+}
+
+void generalArrayFunction(void *arr, int count, size_t size, void (*f)(void *)) {
+    for (int i = 0; i < count; i++)
+    {
+        f((char*)arr + i * size);
+    }
 }

@@ -31,7 +31,7 @@ int	addItemToCart(ShoppingCart* pCart, const char* barcode, float price, int cou
 	{
 		pItem = createItem(barcode, price, count);
 		if (!pItem)
-			return True;
+			return False;
 
 		NODE *pTemp = &pCart->itemList->head;
 		while (pTemp->next != NULL && strcmp(pItem->barcode, ((ShoppingItem*)pTemp->next->key)->barcode) == 1) pTemp = pTemp->next;
@@ -40,7 +40,7 @@ int	addItemToCart(ShoppingCart* pCart, const char* barcode, float price, int cou
 	else {
 		pItem->count += count;
 	}
-	return False;
+	return True;
 }
 
 float	printShoppingCart(const ShoppingCart* pCart)
@@ -50,7 +50,7 @@ float	printShoppingCart(const ShoppingCart* pCart)
 	NODE *pItem = pCart->itemList->head.next;
 	while (pItem != NULL)
 	{
-		price += ((ShoppingItem*)pItem->key)->price;
+		price += ((ShoppingItem*)pItem->key)->price * ((ShoppingItem*)pItem->key)->count;
 		pItem = pItem->next;
 	}
 	printf("Total bill to pay: %.2f\n", price);
@@ -66,6 +66,7 @@ ShoppingItem*	getItemByBarocde(ShoppingCart* pCart, const char* barcode)
 	{
 		if (strcmp(((ShoppingItem*)pItem->key)->barcode, barcode) == 0)
 			return pItem->key;
+        pItem = pItem->next;
 	}
 
 	return NULL;

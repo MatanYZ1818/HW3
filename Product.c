@@ -35,8 +35,9 @@ void initProductName(Product* pProduct)
 	} while (checkEmptyString(pProduct->name));
 }
 
-void	printProduct(const Product* pProduct)
+void	printProduct(void* pProductPtr)
 {
+    Product *pProduct = *(Product**)pProductPtr;
 	char* dateStr = getDateStr(&pProduct->expiryDate);
 	printf("%-20s %-10s\t", pProduct->name, pProduct->barcode);
 	printf("%-20s %5.2f %13d %7s %15s\n", typeStr[pProduct->type], pProduct->price, pProduct->count, " ", dateStr);

@@ -13,3 +13,10 @@ typedef struct
 
 int initClubMember(Customer* pCustomer);
 
+void printClubMember(const Customer* pCustomer);
+
+void clubMemberPay(Customer* pCustomer);
+
+int addDiscount(Customer* pCustomer);
+
+void delDiscount(Customer* pCustomer);

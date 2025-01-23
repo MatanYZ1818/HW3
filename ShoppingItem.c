@@ -7,7 +7,10 @@
 
 void	printItem(const ShoppingItem* pItem)
 {
-	printf("Item %s count %d price per item %.2f\n", pItem->barcode, pItem->count, pItem->price);
+    if (pItem->barcode[0] == 'Z')
+        printf("Membership discount is %.2f\n", pItem->price);
+    else
+	    printf("Item %s count %d price per item %.2f\n", pItem->barcode, pItem->count, pItem->price);
 }
 
 ShoppingItem*	createItem(const char* barcode, float price, int count)
